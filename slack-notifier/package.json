@@ -1,0 +1,10 @@
+{
+  "name": "slack-notifier",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for sending Slack notifications",
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "zip": "zip -r slack-notifier.zip index.mjs package.json"
+  }
+}

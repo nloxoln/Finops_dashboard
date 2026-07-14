@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1",
+    "title": "2026년 6월 AWS 비용 분석 보고서",
+    "createdAt": "2026-07-01",
+    "pdfUrl": "/reports/2026-06.pdf"
+  },
+  {
+    "id": "2",
+    "title": "2026년 5월 AWS 비용 분석 보고서",
+    "createdAt": "2026-06-01",
+    "pdfUrl": "/reports/2026-05.pdf"
+  },
+  {
+    "id": "3",
+    "title": "2026년 4월 AWS 비용 분석 보고서",
+    "createdAt": "2026-05-01",
+    "pdfUrl": "/reports/2026-04.pdf"
+  },
+  {
+    "id": "4",
+    "title": "2026년 3월 AWS 비용 분석 보고서",
+    "createdAt": "2026-04-01",
+    "pdfUrl": "/reports/2026-03.pdf"
+  },
+  {
+    "id": "5",
+    "title": "2026년 2월 AWS 비용 분석 보고서",
+    "createdAt": "2026-03-01",
+    "pdfUrl": "/reports/2026-02.pdf"
+  }
+]

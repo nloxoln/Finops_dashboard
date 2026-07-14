@@ -1,0 +1,42 @@
+[
+  {
+    "id": "1",
+    "date": "2026-06-15",
+    "title": "EC2 인스턴스 비용 급증",
+    "resourceType": "EC2",
+    "rawData": "ap-northeast-2 리전 t3.large 인스턴스 3대 추가 기동 (16:30-18:45), 일일 비용 $342.15 → $567.89",
+    "summary": "서울 리전 t3.large 인스턴스 3대 추가 기동",
+    "cause": "트래픽 증가로 인한 Auto Scaling 그룹 자동 스케일아웃",
+    "actionRequired": true
+  },
+  {
+    "id": "2",
+    "date": "2026-06-22",
+    "title": "RDS 스토리지 사용량 증가",
+    "resourceType": "RDS",
+    "rawData": "db.r5.xlarge (prod-main-db) 스토리지 사용량 750GB → 980GB, 일일 비용 $98.45 → $127.83",
+    "summary": "프로덕션 RDS 인스턴스 스토리지 230GB 증가",
+    "cause": "로그 테이블 정리 작업 미실행으로 인한 누적",
+    "actionRequired": true
+  },
+  {
+    "id": "3",
+    "date": "2026-07-01",
+    "title": "Lambda 호출 건수 급증",
+    "resourceType": "Lambda",
+    "rawData": "image-processor 함수 일일 호출 150만건 → 340만건, 비용 $45.23 → $102.67",
+    "summary": "이미지 처리 Lambda 함수 호출 226% 증가",
+    "cause": "마케팅 캠페인으로 인한 이미지 업로드 급증",
+    "actionRequired": false
+  },
+  {
+    "id": "4",
+    "date": "2026-07-05",
+    "title": "S3 데이터 전송 비용 증가",
+    "resourceType": "S3",
+    "rawData": "media-assets 버킷 아웃바운드 트래픽 12TB → 28TB, 비용 $1,080 → $2,520",
+    "summary": "S3 아웃바운드 데이터 전송 133% 증가",
+    "cause": "신규 서비스 론칭으로 미디어 파일 다운로드 급증",
+    "actionRequired": true
+  }
+]
