@@ -7,33 +7,30 @@ interface ResourceMiniChartProps {
   color: string;
 }
 
+
+
 export const ResourceMiniChart: React.FC<ResourceMiniChartProps> = ({ data, color }) => {
   // 오늘 날짜 기준으로 최근 7일 데이터만 표시 (오늘 포함)
   const getLast7Days = () => {
-    // Mock 데이터의 마지막 날짜를 오늘로 간주
-    if (data.length === 0) return [];
+  if (data.length === 0) return [];
 
-    const todayStr = data[data.length - 1].date; // 마지막 날짜가 오늘
-    const today = new Date(todayStr);
-    const last7Days: CostTrendData[] = [];
+  const today = new Date(); // 실제 오늘 날짜 기준 (mock 마지막 날짜 트릭 제거)
+  const last7Days: CostTrendData[] = [];
 
-    // 6일 전부터 오늘까지 (총 7일)
-    for (let i = 6; i >= 0; i--) {
-      const date = new Date(today);
-      date.setDate(date.getDate() - i);
-      const dateStr = date.toISOString().split('T')[0];
+  for (let i = 6; i >= 0; i--) {
+    const date = new Date(today);
+    date.setDate(date.getDate() - i);
+    const dateStr = date.toISOString().split('T')[0];
 
-      const found = data.find(d => d.date === dateStr);
-      if (found) {
-        last7Days.push({
-          ...found,
-          date: dateStr.substring(5) // MM-DD 형식으로 변환
-        });
-      }
-    }
+    const found = data.find(d => d.date === dateStr);
+    last7Days.push({
+      date: dateStr.substring(5), // MM-DD
+      cost: found ? found.cost : 0, // 없으면 무조건 0으로 채움 → 항상 7개 막대
+    });
+  }
 
-    return last7Days;
-  };
+  return last7Days;
+};
 
   const chartData = getLast7Days();
 

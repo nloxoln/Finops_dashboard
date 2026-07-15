@@ -5,11 +5,13 @@ import { ResourceCard } from '../components/cards/ResourceCard';
 import { CostTrendChart } from '../components/charts/CostTrendChart';
 import { PeriodSelector } from '../components/common/PeriodSelector';
 import { fetchCostSummary, fetchCostTrend, fetchResources } from '../services/api';
+import { useAuth } from '../contexts/AuthContext';
 import type { CostSummary, CostTrendData, Resource, Period } from '../types';
 
 const resourceColors = ['#FF6B9D', '#4A90E2', '#50E3C2', '#F5A623', '#5B4FFF', '#9B59B6'];
 
 export const DashboardPage: React.FC = () => {
+  const { selectedPayer } = useAuth();
   const [costSummary, setCostSummary] = useState<CostSummary | null>(null);
   const [costTrend, setCostTrend] = useState<CostTrendData[]>([]);
   const [resources, setResources] = useState<Resource[]>([]);
@@ -18,14 +20,15 @@ export const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, [selectedPeriod]);
+  }, [selectedPeriod, selectedPayer?.accountId]);
 
   const loadData = async () => {
     try {
+      const accountId = selectedPayer?.accountId;
       const [summary, trend, resourcesData] = await Promise.all([
-        fetchCostSummary(),
-        fetchCostTrend(),
-        fetchResources(),
+        fetchCostSummary(accountId),
+        fetchCostTrend(accountId),
+        fetchResources(accountId),
       ]);
       setCostSummary(summary);
 
@@ -42,7 +45,11 @@ export const DashboardPage: React.FC = () => {
   };
 
   const filterDataByPeriod = (data: CostTrendData[], period: Period): CostTrendData[] => {
-    const now = new Date('2026-07-09'); // 현재 날짜 기준
+    // 데이터의 가장 최근 날짜를 기준으로 필터링 (mock/실데이터 모두 대응)
+    const now =
+      data.length > 0
+        ? new Date(data.reduce((max, d) => (d.date > max ? d.date : max), data[0].date))
+        : new Date();
     let daysToShow = 30;
 
     switch (period) {

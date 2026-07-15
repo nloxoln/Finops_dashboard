@@ -206,6 +206,4 @@ finops_dev/
 
 This project is licensed under the MIT License.
 
-## 문의
 
-프로젝트 관련 문의: jeonhyuk@cj.net

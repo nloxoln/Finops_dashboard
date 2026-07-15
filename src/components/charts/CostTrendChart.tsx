@@ -32,7 +32,7 @@ export const CostTrendChart: React.FC<CostTrendChartProps> = ({ data }) => {
           }}
         />
         <Line
-          type="monotone"
+          type="linear"
           dataKey="cost"
           stroke="#5B4FFF"
           strokeWidth={2}

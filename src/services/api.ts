@@ -1,55 +1,44 @@
 import type { Payer, CostSummary, CostTrendData, Resource, Anomaly, Report } from '../types';
 import payersData from '../mockData/payers.json';
-import costSummaryData from '../mockData/costSummary.json';
-import costTrendData from '../mockData/costTrend.json';
-import resourcesData from '../mockData/resources.json';
 import anomaliesData from '../mockData/anomalies.json';
 import reportsData from '../mockData/reports.json';
+// costSummaryData, costTrendData, resourcesData import 제거
 
-// Simulate API delay
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-export const fetchPayers = async (): Promise<Payer[]> => {
-  await delay(300);
-  return payersData as Payer[];
-};
-
-export const fetchCostSummary = async (): Promise<CostSummary> => {
-  await delay(300);
-  return costSummaryData as CostSummary;
-};
-
-export const fetchCostTrend = async (): Promise<CostTrendData[]> => {
-  await delay(300);
-  return costTrendData as CostTrendData[];
-};
+const COST_API = import.meta.env.VITE_COST_API_ENDPOINT;
 
 export const fetchResources = async (): Promise<Resource[]> => {
-  await delay(300);
-  return resourcesData as Resource[];
+  const res = await fetch(`${COST_API}?days=30`);
+  return res.json();
 };
 
 export const fetchResourceById = async (id: string): Promise<Resource | undefined> => {
-  await delay(300);
-  return (resourcesData as Resource[]).find(r => r.id === id);
+  const resources = await fetchResources();
+  return resources.find(r => r.id === id);
 };
 
-export const fetchAnomalies = async (): Promise<Anomaly[]> => {
-  await delay(300);
-  return anomaliesData as Anomaly[];
+// 계정 전체 추이 = 리소스별 데이터를 날짜 기준으로 합산
+export const fetchCostTrend = async (): Promise<CostTrendData[]> => {
+  const resources = await fetchResources();
+  const totals = new Map<string, number>();
+  resources.forEach(r => r.costTrend.forEach(({ date, cost }) => {
+    totals.set(date, (totals.get(date) || 0) + cost);
+  }));
+  return Array.from(totals.entries())
+    .map(([date, cost]) => ({ date, cost }))
+    .sort((a, b) => a.date.localeCompare(b.date));
 };
 
-export const fetchAnomaliesByResource = async (resourceType: string): Promise<Anomaly[]> => {
-  await delay(300);
-  return (anomaliesData as Anomaly[]).filter(a => a.resourceType === resourceType);
+// costSummary(이번달/저번달/평균)는 그대로 mock 유지해도 되고,
+// 나중에 GroupBy 없이 월단위 GetCostAndUsage 한 번 더 호출해서 구해도 됨
+export const fetchCostSummary = async (): Promise<CostSummary> => {
+  const costSummaryData = await import('../mockData/costSummary.json');
+  return costSummaryData.default as CostSummary;
 };
 
-export const fetchReports = async (): Promise<Report[]> => {
-  await delay(300);
-  return reportsData as Report[];
-};
-
-export const fetchReportById = async (id: string): Promise<Report | undefined> => {
-  await delay(300);
-  return (reportsData as Report[]).find(r => r.id === id);
-};
+export const fetchPayers = async (): Promise<Payer[]> => payersData as Payer[];
+export const fetchAnomalies = async (): Promise<Anomaly[]> => anomaliesData as Anomaly[];
+export const fetchAnomaliesByResource = async (resourceType: string): Promise<Anomaly[]> =>
+  (anomaliesData as Anomaly[]).filter(a => a.resourceType === resourceType);
+export const fetchReports = async (): Promise<Report[]> => reportsData as Report[];
+export const fetchReportById = async (id: string): Promise<Report | undefined> =>
+  (reportsData as Report[]).find(r => r.id === id);

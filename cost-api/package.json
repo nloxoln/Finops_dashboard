@@ -1,0 +1,13 @@
+{
+  "name": "cost-api",
+  "version": "1.0.0",
+  "description": "AWS Lambda function for fetching cost data from Cost Explorer",
+  "main": "index.mjs",
+  "type": "module",
+  "scripts": {
+    "zip": "zip -r cost-api.zip index.mjs package.json node_modules"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cost-explorer": "^3.658.0"
+  }
+}

@@ -26,7 +26,7 @@ export const ResourceDetailPage: React.FC = () => {
     if (resourceId) {
       loadData();
     }
-  }, [resourceId]);
+  }, [resourceId, selectedPayer?.accountId]);
 
   useEffect(() => {
     if (resource) {
@@ -41,7 +41,7 @@ export const ResourceDetailPage: React.FC = () => {
   const loadData = async () => {
     try {
       const [resourceData, anomaliesData] = await Promise.all([
-        fetchResourceById(resourceId!),
+        fetchResourceById(resourceId!, selectedPayer?.accountId),
         fetchAnomaliesByResource(resourceId!.toUpperCase()),
       ]);
       setResource(resourceData || null);
@@ -56,7 +56,12 @@ export const ResourceDetailPage: React.FC = () => {
   const filterChartData = () => {
     if (!resource) return;
 
-    const now = new Date('2026-07-09');
+    // 리소스 데이터의 가장 최근 날짜 기준 (mock/실데이터 모두 대응)
+    const trendData = resource.costTrend;
+    const now =
+      trendData.length > 0
+        ? new Date(trendData.reduce((max, d) => (d.date > max ? d.date : max), trendData[0].date))
+        : new Date();
     let daysToShow = 30;
 
     switch (selectedPeriod) {

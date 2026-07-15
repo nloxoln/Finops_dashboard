@@ -30,3 +30,5 @@ dist-ssr
 
 # Lambda
 slack-notifier/slack-notifier.zip
+cost-api/cost-api.zip
+cost-api/node_modules
