@@ -7,7 +7,8 @@ import { PeriodSelector } from '../components/common/PeriodSelector';
 import { DatePicker } from '../components/common/DatePicker';
 import { AnomalyTable } from '../components/tables/AnomalyTable';
 import { useAuth } from '../contexts/AuthContext';
-import { fetchResourceById, fetchAnomaliesByResource } from '../services/api';
+import { fetchAnomaliesByResource } from '../services/api';
+import { fetchCostData, isRealAccount } from '../services/costApi';
 import type { Resource, Anomaly, Period, CostTrendData } from '../types';
 
 export const ResourceDetailPage: React.FC = () => {
@@ -39,11 +40,18 @@ export const ResourceDetailPage: React.FC = () => {
   }, [startDate, endDate, allAnomalies]);
 
   const loadData = async () => {
+    setLoading(true);
     try {
-      const [resourceData, anomaliesData] = await Promise.all([
-        fetchResourceById(resourceId!, selectedPayer?.accountId),
-        fetchAnomaliesByResource(resourceId!.toUpperCase()),
-      ]);
+      const accountId = selectedPayer?.accountId;
+
+      // 리소스 상세: 올리브영(실계정)만 cost-api 에서 리소스 목록을 받아 id 로 찾음
+      let resourceData: Resource | undefined;
+      if (isRealAccount(accountId)) {
+        const { resources } = await fetchCostData(accountId);
+        resourceData = resources.find((r) => r.id === resourceId);
+      }
+
+      const anomaliesData = await fetchAnomaliesByResource(resourceId!.toUpperCase());
       setResource(resourceData || null);
       setAllAnomalies(anomaliesData);
     } catch (error) {

@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Cloud } from 'lucide-react';
 import { Button } from '../components/common/Button';
-import { useAuth } from '../contexts/AuthContext';
-import { fetchPayers } from '../services/api';
-import type { Payer } from '../types';
 
 export const LoginPage: React.FC = () => {
   const [username, setUsername] = useState('');

@@ -4,7 +4,8 @@ import { CostSummaryCard } from '../components/cards/CostSummaryCard';
 import { ResourceCard } from '../components/cards/ResourceCard';
 import { CostTrendChart } from '../components/charts/CostTrendChart';
 import { PeriodSelector } from '../components/common/PeriodSelector';
-import { fetchCostSummary, fetchCostTrend, fetchResources } from '../services/api';
+import { fetchCostSummary } from '../services/api';
+import { fetchCostData, isRealAccount } from '../services/costApi';
 import { useAuth } from '../contexts/AuthContext';
 import type { CostSummary, CostTrendData, Resource, Period } from '../types';
 
@@ -23,20 +24,22 @@ export const DashboardPage: React.FC = () => {
   }, [selectedPeriod, selectedPayer?.accountId]);
 
   const loadData = async () => {
+    setLoading(true);
     try {
       const accountId = selectedPayer?.accountId;
-      const [summary, trend, resourcesData] = await Promise.all([
-        fetchCostSummary(accountId),
-        fetchCostTrend(accountId),
-        fetchResources(accountId),
-      ]);
-      setCostSummary(summary);
 
-      // 기간에 따라 데이터 필터링
-      const filteredTrend = filterDataByPeriod(trend, selectedPeriod);
-      setCostTrend(filteredTrend);
-
-      setResources(resourcesData);
+      if (isRealAccount(accountId)) {
+        // 올리브영(실계정): 배포된 cost-api 를 한 번 호출해 요약/추이/리소스를 모두 받음
+        const { summary, trend, resources } = await fetchCostData(accountId);
+        setCostSummary(summary);
+        setCostTrend(filterDataByPeriod(trend, selectedPeriod));
+        setResources(resources);
+      } else {
+        // 실데이터 미연동 계정: 요약만 mock, 추이/리소스는 비움
+        setCostSummary(await fetchCostSummary());
+        setCostTrend([]);
+        setResources([]);
+      }
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
     } finally {
