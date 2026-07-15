@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { CostSummaryCard } from '../components/cards/CostSummaryCard';
 import { ResourceCard } from '../components/cards/ResourceCard';
@@ -14,14 +14,15 @@ const resourceColors = ['#FF6B9D', '#4A90E2', '#50E3C2', '#F5A623', '#5B4FFF', '
 export const DashboardPage: React.FC = () => {
   const { selectedPayer } = useAuth();
   const [costSummary, setCostSummary] = useState<CostSummary | null>(null);
-  const [costTrend, setCostTrend] = useState<CostTrendData[]>([]);
+  const [fullTrend, setFullTrend] = useState<CostTrendData[]>([]); // 필터 전 전체 추이(원본)
   const [resources, setResources] = useState<Resource[]>([]);
   const [selectedPeriod, setSelectedPeriod] = useState<Period>('1m');
   const [loading, setLoading] = useState(true);
 
+  // 데이터 로딩은 "계정이 바뀔 때"만. 기간 변경은 아래 useMemo 로 클라이언트 필터만 함(재요청 X)
   useEffect(() => {
     loadData();
-  }, [selectedPeriod, selectedPayer?.accountId]);
+  }, [selectedPayer?.accountId]);
 
   const loadData = async () => {
     setLoading(true);
@@ -32,12 +33,12 @@ export const DashboardPage: React.FC = () => {
         // 올리브영(실계정): 배포된 cost-api 를 한 번 호출해 요약/추이/리소스를 모두 받음
         const { summary, trend, resources } = await fetchCostData(accountId);
         setCostSummary(summary);
-        setCostTrend(filterDataByPeriod(trend, selectedPeriod));
+        setFullTrend(trend);
         setResources(resources);
       } else {
         // 실데이터 미연동 계정: 요약만 mock, 추이/리소스는 비움
         setCostSummary(await fetchCostSummary());
-        setCostTrend([]);
+        setFullTrend([]);
         setResources([]);
       }
     } catch (error) {
@@ -81,6 +82,27 @@ export const DashboardPage: React.FC = () => {
       return itemDate >= cutoffDate && itemDate <= now;
     });
   };
+
+  // 기간 변경 시 재요청 없이 이미 받은 추이만 다시 필터 → 추이 그래프만 갱신됨
+  const costTrend = useMemo(
+    () => filterDataByPeriod(fullTrend, selectedPeriod),
+    [fullTrend, selectedPeriod]
+  );
+
+  // 리소스 카드는 "최근 7일간 비용이 발생한 서비스"만 노출 (7일 내 0원이면 카드 미생성)
+  const visibleResources = useMemo(() => {
+    const allDates = resources.flatMap((r) => r.costTrend.map((p) => p.date));
+    if (allDates.length === 0) return [];
+    const refNow = new Date(allDates.reduce((max, d) => (d > max ? d : max)));
+    const cutoff = new Date(refNow);
+    cutoff.setDate(cutoff.getDate() - 7);
+    return resources.filter((r) =>
+      r.costTrend.some((p) => {
+        const dt = new Date(p.date);
+        return dt > cutoff && dt <= refNow && p.cost > 0;
+      })
+    );
+  }, [resources]);
 
   if (loading) {
     return (
@@ -150,7 +172,7 @@ export const DashboardPage: React.FC = () => {
         <div>
           <h2 className="text-xl font-bold text-gray-900 mb-6">리소스별 비용 추이 그래프</h2>
           <div className="grid grid-cols-3 gap-6">
-            {resources.map((resource, index) => (
+            {visibleResources.map((resource, index) => (
               <ResourceCard
                 key={resource.id}
                 resource={resource}
