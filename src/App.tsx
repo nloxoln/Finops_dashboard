@@ -7,6 +7,7 @@ import { ResourceDetailPage } from './pages/ResourceDetailPage';
 import { ReportsPage } from './pages/ReportsPage';
 import { ReportDetailPage } from './pages/ReportDetailPage';
 import { MyPage } from './pages/MyPage';
+import { AnomalyHistoryPage } from './pages/AnomalyHistoryPage';
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated } = useAuth();
@@ -57,6 +58,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <MyPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/anomalies"   
+            element={
+              <ProtectedRoute>
+                <AnomalyHistoryPage />
               </ProtectedRoute>
             }
           />

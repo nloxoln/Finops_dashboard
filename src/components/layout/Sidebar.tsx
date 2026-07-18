@@ -1,9 +1,9 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LayoutDashboard, FileText, Cloud } from 'lucide-react';
-
+import { LayoutDashboard, FileText, Cloud, AlertTriangle } from 'lucide-react';
 const menuItems = [
   { path: '/dashboard', label: '메인화면', icon: LayoutDashboard },
+  { path: '/anomalies', label: '이상 탐지 내역', icon: AlertTriangle },
   { path: '/reports', label: '종합보고서', icon: FileText },
 ];
 

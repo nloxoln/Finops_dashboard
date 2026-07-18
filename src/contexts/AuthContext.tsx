@@ -11,8 +11,29 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+const STORAGE_KEY = 'oclould_finops_selected_payer';
+
+const readStoredPayer = (): Payer | null => {
+  try {
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as Payer) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [selectedPayer, setSelectedPayer] = useState<Payer | null>(null);
+  // 새로고침/뒤로가기 시 sessionStorage에서 복원
+  const [selectedPayer, setSelectedPayerState] = useState<Payer | null>(readStoredPayer);
+
+  const setSelectedPayer = (payer: Payer | null) => {
+    setSelectedPayerState(payer);
+    if (payer) {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payer));
+    } else {
+      sessionStorage.removeItem(STORAGE_KEY);
+    }
+  };
 
   const login = (payer: Payer) => {
     setSelectedPayer(payer);

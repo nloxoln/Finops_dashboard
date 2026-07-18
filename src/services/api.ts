@@ -28,8 +28,6 @@ export const fetchCostTrend = async (): Promise<CostTrendData[]> => {
     .sort((a, b) => a.date.localeCompare(b.date));
 };
 
-// costSummary(이번달/저번달/평균)는 그대로 mock 유지해도 되고,
-// 나중에 GroupBy 없이 월단위 GetCostAndUsage 한 번 더 호출해서 구해도 됨
 export const fetchCostSummary = async (): Promise<CostSummary> => {
   const costSummaryData = await import('../mockData/costSummary.json');
   return costSummaryData.default as CostSummary;
