@@ -2,6 +2,8 @@
 // 심각도(severity)에 따라 색상/이모지를 달리해 한눈에 구분되게 한다.
 //   - CRITICAL : 🔴 빨강 (4σ 초과 ≈ 상위 0.003%)
 //   - WARNING  : 🟠 주황 (2σ 초과 ≈ 상위 2.3%)
+//   - CREATE   : 🟢 초록 (리소스 생성 감지)
+//   - MODIFY   : 🟣 보라 (리소스 사양 변경 감지)
 //   - (그 외)  : 🔵 파랑 (테스트/정보)
 
 const CORS = {
@@ -13,6 +15,8 @@ const CORS = {
 const SEVERITY_STYLE = {
   CRITICAL: { color: '#E01E5A', emoji: '🔴', label: '심각(CRITICAL)' },
   WARNING: { color: '#F5A623', emoji: '🟠', label: '경고(WARNING)' },
+  CREATE: { color: '#2EB67D', emoji: '🟢', label: '리소스 생성 감지' },
+  MODIFY: { color: '#611F69', emoji: '🟣', label: '리소스 사양 변경 감지' },
   INFO: { color: '#4A90E2', emoji: '🔵', label: '정보' },
 };
 
@@ -37,7 +41,7 @@ export const handler = async (event) => {
     const body = typeof event.body === 'string' ? JSON.parse(event.body) : event.body || {};
     const {
       company = '올리브영',
-      severity, // 'CRITICAL' | 'WARNING' | undefined
+      severity, // 'CRITICAL' | 'WARNING' | 'CREATE' | 'MODIFY' | undefined
       service,
       rawData,
       summary,
@@ -46,12 +50,18 @@ export const handler = async (event) => {
       metric, // { expected, actual, z }
       detectedAt,
       hourUTC,
+      // ---- 신규(선택) 필드. 안 보내면 기존 동작 그대로 (하위호환) ----
+      title, // 커스텀 제목. 주면 "[company 비용 이상탐지] label" 대신 이걸 사용
+      hideActionRequired, // true 면 '조치 필요' 필드 숨김
     } = body;
 
     const style = SEVERITY_STYLE[severity] || SEVERITY_STYLE.INFO;
 
     // ---- 헤더 라인 ----
-    const headerText = `${style.emoji} [${company} 비용 이상탐지] ${style.label}${service ? ` · ${service}` : ''}`;
+    // title 이 오면 커스텀 제목 사용, 없으면 기존 포맷 유지
+    const headerText = title
+      ? `${style.emoji} [${company}] ${title}${service ? ` · ${service}` : ''}`
+      : `${style.emoji} [${company} 비용 이상탐지] ${style.label}${service ? ` · ${service}` : ''}`;
 
     // ---- 상세 필드 (Block Kit) ----
     const fields = [];
@@ -63,7 +73,9 @@ export const handler = async (event) => {
     }
     if (hourUTC) fields.push({ type: 'mrkdwn', text: `*대상 시각(UTC)*\n${hourUTC}` });
     if (detectedAt) fields.push({ type: 'mrkdwn', text: `*탐지 시각*\n${detectedAt}` });
-    fields.push({ type: 'mrkdwn', text: `*조치 필요*\n${actionRequired ? ':exclamation: 예' : '아니요'}` });
+    if (!hideActionRequired) {
+      fields.push({ type: 'mrkdwn', text: `*조치 필요*\n${actionRequired ? ':exclamation: 예' : '아니요'}` });
+    }
 
     const blocks = [
       { type: 'header', text: { type: 'plain_text', text: headerText, emoji: true } },

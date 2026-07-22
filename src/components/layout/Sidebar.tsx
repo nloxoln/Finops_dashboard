@@ -16,7 +16,7 @@ export const Sidebar: React.FC = () => {
         <Link to="/dashboard" className="flex items-center gap-2">
           <Cloud className="text-primary" size={32} />
           <div>
-            <h1 className="text-xl font-bold text-gray-900">O'CLOUD</h1>
+            <h1 className="text-xl font-bold text-gray-900">CJ COST</h1>
             <p className="text-sm text-primary">FinOps</p>
           </div>
         </Link>

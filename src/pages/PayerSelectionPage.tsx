@@ -55,7 +55,7 @@ export const PayerSelectionPage: React.FC = () => {
           <div className="flex items-center gap-3">
             <Cloud className="text-primary" size={48} />
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">O'CLOUD</h1>
+              <h1 className="text-3xl font-bold text-gray-900">CJ COST</h1>
               <p className="text-lg text-primary">FinOps</p>
             </div>
           </div>
