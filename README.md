@@ -158,23 +158,6 @@ CJ 올리브영만 실제 데이터를 반영합니다.
 
 실제 AWS Cost Explorer API 연동 시 `src/services/api.ts`를 수정하세요.
 
-## 디자인 시스템
-
-### 색상
-- **Primary**: `#5B4FFF` (보라색)
-- **Blue**: `#4A90E2` (저번달 비용)
-- **Green**: `#50E3C2` (평균 비용)
-- **Orange**: `#F5A623` (이번달 비용)
-
-### 폰트
-- Pretendard (한글)
-- Inter (영문)
-
-### 레이아웃
-- 데스크톱 전용 (최소 너비 1280px)
-- 고정 사이드바 (왼쪽 240px)
-- 상단 헤더 (64px)
-
 ## 주의사항
 
 - **인증**: 현재 Mock 구현 (실제 Payer 권한 인증 필요)
@@ -190,20 +173,5 @@ CJ 올리브영만 실제 데이터를 반영합니다.
 2. `src/App.tsx` 에 라우트 추가
 3. 필요시 `src/components/layout/Sidebar.tsx` 에 메뉴 추가
 
-### 새로운 Mock 데이터 추가
-
-1. `src/mockData/` 에 JSON 파일 생성
-2. `src/services/api.ts` 에 fetch 함수 추가
-3. `src/types/index.ts` 에 타입 정의 추가
-
-### 스타일 커스터마이징
-
-- 색상: `tailwind.config.js` 수정
-- 글로벌 스타일: `src/index.css` 수정
-- 컴포넌트 스타일: Tailwind CSS 유틸리티 클래스 사용
-
-## 라이선스
-
-This project is licensed under the MIT License.
 
 
