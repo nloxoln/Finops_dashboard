@@ -1,4 +1,4 @@
-# -FinOps 플랫폼
+# FinOps 플랫폼
 
 AWS 계열사별 클라우드 비용 관리를 위한 FinOps 플랫폼입니다.
 
